@@ -620,6 +620,12 @@ class MarkdownConverter(object):
         if 'li' in parent_tags:
             # remove trailing newline if we're in a nested list
             return '\n' + text.rstrip()
+        if el.parent is not None and el.parent.name in ['ul', 'ol']:
+            # a list placed directly inside another list: indent it under the
+            # preceding item rather than starting a new top-level list
+            text = re_line_with_content.sub(
+                lambda m: '    ' + m.group(1) if m.group(1) else '', text)
+            return text.rstrip() + '\n'
         return '\n\n' + text + ('\n' if before_paragraph else '')
 
     convert_ul = convert_list

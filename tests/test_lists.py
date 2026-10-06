@@ -81,6 +81,10 @@ def test_nested_uls():
     assert md(nested_uls) == '\n\n* 1\n  + a\n    - I\n    - II\n    - III\n  + b\n  + c\n* 2\n* 3\n'
 
 
+def test_list_directly_inside_list():
+    assert md('<ul><li>a</li><li>b</li><ul><li>c</li><li>d</li></ul></ul>') == '\n\n* a\n* b\n    + c\n    + d\n'
+
+
 def test_bullets():
     assert md(nested_uls, bullets='-') == '\n\n- 1\n  - a\n    - I\n    - II\n    - III\n  - b\n  - c\n- 2\n- 3\n'
 
