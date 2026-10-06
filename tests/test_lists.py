@@ -87,3 +87,9 @@ def test_bullets():
 
 def test_li_text():
     assert md('<ul><li>foo <a href="#">bar</a></li><li>foo bar  </li><li>foo <b>bar</b>   <i>space</i>.</ul>') == '\n\n* foo [bar](#)\n* foo bar\n* foo **bar** *space*.\n'
+
+
+def test_adjacent_lists():
+    assert md('<ol><li>A</li><li>B</li></ol><ul><li>a</li><li>b</li></ul>') == '\n\n1. A\n2. B\n\n\n* a\n* b\n'
+    assert md('<ul><li>a</li></ul><ul><li>b</li></ul>') == '\n\n* a\n\n\n* b\n'
+    assert md('<ul><li>a</li></ul><ul><li>b</li></ul><p>c</p>') == '\n\n* a\n\n\n* b\n\nc\n\n'

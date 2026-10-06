@@ -307,7 +307,10 @@ class MarkdownConverter(object):
                 # use the larger newline count, limited to 2.
                 if updated_child_strings[-1] and leading_nl:
                     prev_trailing_nl = updated_child_strings.pop()  # will be replaced by the collapsed value
-                    num_newlines = min(2, max(len(prev_trailing_nl), len(leading_nl)))
+                    # Limited to 2, unless the previous child explicitly asked for 3
+                    # (adjacent lists).
+                    max_newlines = 3 if len(prev_trailing_nl) == 3 else 2
+                    num_newlines = min(max_newlines, max(len(prev_trailing_nl), len(leading_nl)))
                     leading_nl = '\n' * num_newlines
 
                 # Add the results to the updated child string list.
@@ -614,12 +617,18 @@ class MarkdownConverter(object):
         # Ignoring inline conversion parents for list.
 
         before_paragraph = False
+        adjacent_list = False
         next_sibling = _next_block_content_sibling(el)
         if next_sibling and next_sibling.name not in ['ul', 'ol']:
             before_paragraph = True
+        elif next_sibling:
+            adjacent_list = True
         if 'li' in parent_tags:
             # remove trailing newline if we're in a nested list
             return '\n' + text.rstrip()
+        if adjacent_list:
+            # Use two blank lines so that adjacent lists are not merged into one.
+            return '\n\n' + text + '\n\n'
         return '\n\n' + text + ('\n' if before_paragraph else '')
 
     convert_ul = convert_list
