@@ -2,7 +2,8 @@
 Test whitelisting/blacklisting of specific tags.
 
 """
-from markdownify import markdownify, LSTRIP, RSTRIP, STRIP, STRIP_ONE
+from bs4 import BeautifulSoup
+from markdownify import MarkdownConverter, markdownify, LSTRIP, RSTRIP, STRIP, STRIP_ONE
 from .utils import md
 
 
@@ -32,6 +33,17 @@ def test_strip_document():
     assert markdownify("<p>Hello</p>", strip_document=RSTRIP) == "\n\nHello"
     assert markdownify("<p>Hello</p>", strip_document=STRIP) == "Hello"
     assert markdownify("<p>Hello</p>", strip_document=None) == "\n\nHello\n\n"
+
+
+def test_strip_document_tag():
+    html = "<html><body><div><p>hello</p></div></body></html>"
+    soup = BeautifulSoup(html, "html.parser")
+    tag = soup.find("html")
+    assert MarkdownConverter().convert_soup(soup) == "hello"
+    assert MarkdownConverter().convert_soup(tag) == "hello"
+    assert MarkdownConverter(strip_document=LSTRIP).convert_soup(tag) == "hello\n\n"
+    assert MarkdownConverter(strip_document=RSTRIP).convert_soup(tag) == "\n\nhello"
+    assert MarkdownConverter(strip_document=None).convert_soup(tag) == "\n\nhello\n\n"
 
 
 def test_strip_pre():

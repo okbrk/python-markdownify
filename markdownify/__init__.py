@@ -223,7 +223,12 @@ class MarkdownConverter(object):
         return self.convert_soup(soup)
 
     def convert_soup(self, soup):
-        return self.process_tag(soup, parent_tags=set())
+        text = self.process_tag(soup, parent_tags=set())
+        if not isinstance(soup, BeautifulSoup):
+            # A BeautifulSoup object gets document-level formatting from
+            # convert__document_ in process_tag; apply it to a plain Tag too.
+            text = self.convert__document_(soup, text, parent_tags=set())
+        return text
 
     def process_element(self, node, parent_tags=None):
         if isinstance(node, NavigableString):
